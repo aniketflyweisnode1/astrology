@@ -34,9 +34,9 @@ app.get("/home", (req, res) => {
 
 
 
-app.all("*", (req, res, next) => {
-  res.send("This Route is not registered!! ❗");
-});
+// app.all("*", (req, res, next) => {
+//   res.send("This Route is not registered!! ❗");
+// });
 
 app.use(globalErrorHandler);
 

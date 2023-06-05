@@ -62,9 +62,9 @@ require("./Routes/UserRouter/media.route")(app);
 require("./Routes/UserRouter/payment.route")(app);
 require("./Routes/UserRouter/productReview.route")(app);
 
-const PORT = 8080;
-app.listen(PORT, () => {
-  console.log(`Server run on ${PORT}`);
+const Port = process.env.PORT||8080;
+app.listen(Port, () => {
+  console.log(`Server run on ${Port}`);
 })
 
 module.exports = { handler: serverless(app) }

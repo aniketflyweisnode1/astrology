@@ -1,15 +1,18 @@
-const { default: mongoose } = require("mongoose");
-mongoose.set('strictQuery', true);
+const mongoose = require("mongoose");
 require("dotenv").config();
 
-const dbConnect = () => {
+mongoose.set('strictQuery', true);
+
+const dbConnect = async () => {
   try {
-    mongoose.connect(process.env.MONGO_URL);
-    console.log("database connected")
+    await mongoose.connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Database connected");
   } catch (error) {
-    console.log("database connected")
+    console.error("Error connecting to the database:", error);
   }
+};
 
-}
-
-module.exports = { dbConnect }
+module.exports = { dbConnect };

@@ -3,7 +3,7 @@ const User = require("../../Model/UserModel/User");
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../../utils/AppError");
 const Astrologer = require("../../Model/AstroModel/astrologer");
-const Notification = require("../../Model/UserModel/notification");
+const Notification = require("../../Model/UserModel/Notification");
 
 exports.follow = async (req, res, next) => {
     try {

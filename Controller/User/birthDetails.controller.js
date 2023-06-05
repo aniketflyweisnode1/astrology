@@ -1,7 +1,7 @@
 const birthDetails = require("../../Model/UserModel/birthDetails");
 const Astrologer = require("../../Model/AstroModel/astrologer");
 const User = require("../../Model/UserModel/User");
-const Notification = require("../../Model/UserModel/notification");
+const Notification = require("../../Model/UserModel/Notification");
 
 exports.updateBirthDetails = async (req, res) => {
     try {

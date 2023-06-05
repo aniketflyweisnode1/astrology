@@ -1,7 +1,7 @@
 // const UserSetting = require("../models/userSetting");
 const User = require("../../Model/UserModel/User");
 const Astrologer = require("../../Model/AstroModel/astrologer");
-const Notification = require("../../Model/UserModel/notification");
+const Notification = require("../../Model/UserModel/Notification");
 module.exports.UserSettings = async (req, res) => {
     try {
         if (!(UserId && ActiveNotification)) {

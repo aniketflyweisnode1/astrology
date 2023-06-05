@@ -6,7 +6,7 @@ const { encrypt, compare } = require("../../services/crypto");
 const bcrypt = require("bcryptjs");
 // const client = require("twilio")(accountSid, authToken);
 const jwt = require("jsonwebtoken");
-const JWTkey = "rubi";
+const JWT_KEY = "rubi";
 const AppError = require("../../utils/AppError");
 const catchAsync = require("../../utils/catchAsync");
 const otp = require("../../services/OTP");
@@ -21,7 +21,7 @@ dotenv.config({ path: "../.env" });
 const { status } = require('express/lib/response');
 
 const generateJwtToken = (id) => {
-  return jwt.sign({ id }, JWTkey, {
+  return jwt.sign({ id }, JWT_KEY, {
     expiresIn: "30d",
   });
 };
@@ -155,7 +155,7 @@ module.exports.login = async (req, res) => {
       });
     const isPassword = bcrypt.compareSync(password, user.password);
     if (isPassword) {
-      jwt.sign({ id: user._id }, JWTkey, (err, token) => {
+      jwt.sign({ id: user._id }, JWT_KEY, (err, token) => {
         if (err) return res.status(401).send("Invalid Credentials");
         console.log(token);
         return res.status(200).send({ user, token });
@@ -186,7 +186,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // 2) Verification of Token
-  const decoded = await promisify(jwt.verify)(token, JWTkey);
+  const decoded = await promisify(jwt.verify)(token, JWT_KEY);
 
   // 3) Check if user still exists.
   const currentUser = await User.findById(decoded.id);
@@ -210,7 +210,7 @@ exports.isAuthenticated = async (req, res, next) => {
       req.headers.authorization.split(" ")[1];
     console.log(token);
 
-    jwt.verify(token, JWTkey, async (err, decoded) => {
+    jwt.verify(token, JWT_KEY, async (err, decoded) => {
       if (err) {
         console.log(err);
         return res.status(401).send({
@@ -492,7 +492,7 @@ exports.verifyMobileOtp = async (req, res) => {
     if (user.otp != req.body.otp) {
       return res.status(400).send({ message: "Invalid OTP" });
     }
-    const accessToken = jwt.sign({ id: user._id }, JWTkey, (err, token) => {
+    const accessToken = jwt.sign({ id: user._id }, JWT_KEY, (err, token) => {
       if (err) return res.status(400).send("Invalid Credentials");
       console.log(token);
       res.status(200).send({ token, user });
@@ -518,7 +518,7 @@ exports.login = async (req, res) => {
       });
     const isPassword = await compare(password, user.password);
     if (isPassword) {
-      jwt.sign({ id: user._id }, JWTkey, (err, token) => {
+      jwt.sign({ id: user._id }, JWT_KEY, (err, token) => {
         if (err) return res.status(400).send("Invalid Credentials");
         res.status(200).send({ token, user });
       });

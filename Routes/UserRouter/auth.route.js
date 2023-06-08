@@ -2,6 +2,7 @@
 const router = require("express").Router();
 const authController = require("../../Controller/User/auth.controller");
 const { isAuthenticated } = require("../../Controller/User/auth.controller");
+const verfiyToken = require("../../Middleware/auth");
 var multer = require("multer");
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -21,23 +22,25 @@ router.put("/signup2/:id", authController.signup2);
 router.post("/login", authController.login);
 router.post("/verify/:id", authController.verifyOTP);
 router.post("/loginwithmobile", authController.loginWithMobile);
-router.post("/verifymobileotp/:id", authController.verifyMobileOtp);
+router.post("/verifymobileotp/:id", verfiyToken, authController.verifyMobileOtp);
 router.post("/forgotpassword", authController.forgetPassword);
-router.patch("/resetpassword/:id", authController.resetPassword);
+router.patch("/resetpassword/:id", verfiyToken, authController.resetPassword);
 
 // router.post("/sendOTP", authController.sendOTP);
-router.post("/verify", authController.verifyOTP);
-router.post("/sign/verify", authController.verifyOTPSignedIn);
-router.post("/login", authController.login);
+router.post("/verify", verfiyToken, authController.verifyOTP);
+router.post("/sign/verify", verfiyToken, authController.verifyOTPSignedIn);
+router.post("/login", verfiyToken, authController.login);
 
 router.put(
     "/update-profile/:id",
     isAuthenticated,
+    verfiyToken,
     authController.updateUserProfile
 );
 router.get(
     "/view-user-profiles",
     isAuthenticated,
+    verfiyToken,
     authController.GetUserProfiles
 );
 

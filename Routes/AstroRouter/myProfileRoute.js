@@ -7,12 +7,14 @@ const {
   CreatePostProfile,
 } = require("../../Controller/Astrologer/myProfileCtrl");
 
+const verfiyToken = require("../../Middleware/auth");
+
 const myProfileRouter = express.Router();
 
 myProfileRouter.post("/profiles", Profile);
-myProfileRouter.get("/profiles", getProfile);
+myProfileRouter.get("/profiles", verfiyToken, getProfile);
 myProfileRouter.get("/profiles/:profileId", getSingleProfile);
-myProfileRouter.post("/profiles", AddFollower);
-myProfileRouter.post("/profiles/: profileId / posts", CreatePostProfile);
+myProfileRouter.post("/profiles", verfiyToken, AddFollower);
+myProfileRouter.post("/profiles/: profileId / posts", verfiyToken, CreatePostProfile);
 
 module.exports = myProfileRouter;

@@ -15,81 +15,62 @@ const address = require("../../Controller/User/address.controller");
 const productOrder = require("../../Controller/User/productOrder");
 const productReview = require("../../Controller/User/productReview.controller");
 
-router.get("/search-language", isAuthenticated, user.SearchUserNameLangSkills);
-router.get("/search-any-user-name", isAuthenticated, user.SearchUserName);
-router.get(
-    "/search-by-languages",
-    isAuthenticated,
-    user.SearchAnyLanguagesName
-);
-router.delete("/removed/:user_Name", isAuthenticated, user.deleteUserName);
+const verfiyToken = require("../../Middleware/auth");
 
-router.delete(
-    "/removed-language/:language",
-    isAuthenticated,
-    user.deleteLanguages
-);
-//blogs
+router.get("/search-language", verfiyToken, user.SearchUserNameLangSkills);
+router.get("/search-any-user-name", verfiyToken, user.SearchUserName);
+router.get("/search-by-languages", verfiyToken, user.SearchAnyLanguagesName);
+router.delete("/removed/:user_Name", verfiyToken, user.deleteUserName);
 
-// router.put("/blogs/:id", admin.UpdateBlogs);
+router.delete("/removed-language/:language", verfiyToken, user.deleteLanguages);
 
-/////////////////////////////// commit
+// Blogs
+// router.put("/blogs/:id", admin.updateBlogById);
+// router.get("/blogs/:id", admin.getBlogById);
+// router.get("/blogs", admin.getBlogs);
 
-// router.get("/blogs/:id", admin.ViewDataBlogs);
-// router.get("/blogs", admin.GetBlogs);
+// Products
+router.get("/products/:id", verfiyToken, product.getProduct);
+router.get("/products", verfiyToken, product.getProducts);
 
-//Products
-router.get("/products/:id", product.getProduct);
-router.get("/products", product.getProducts);
+// Cart
+router.get("/cart/:id", verfiyToken, cart.getItemInCartOfUser);
+router.post("/cart", verfiyToken, cart.addToCart);
 
-//Cart
-router.get("/cart/:id", cart.getItemInCartOfUser);
-router.post("/cart", isAuthenticated, cart.addToCart);
+// Address
+router.post("/address", verfiyToken, address.create);
+router.get("/address/:id", verfiyToken, address.getByUserId);
 
-//Address
-router.post("/address", address.create);
-router.get("/address/:id", address.getByUserId);
+// Product Order
+router.post("/productOrder", verfiyToken, productOrder.createCartProductOrder);
+router.get("/productOrder", verfiyToken, productOrder.getCartProductOrders);
 
-//productOrder
-router.post(
-    "/productOrder",
-    isAuthenticated,
-    productOrder.createCartProductOrder
-);
-router.get("/productOrder", productOrder.getCartProductOrders);
-
-//productReciew
-router.post("/productReview", isAuthenticated, productReview.createReview);
+// Product Review
+router.post("/productReview", verfiyToken, productReview.createReview);
 router.get("/productReview", productReview.getAllReviews);
 
+// Users
 router.get("/", user.getAllUsers);
-// router.route("/follow").post(isAuthenticated, followController.followById);
+router.put("/feedback/:id", verfiyToken, user.updateFeedback);
+router.delete("/feedback/:id", verfiyToken, user.deleteFeedback);
+router.post("/feedback", verfiyToken, user.UserFeedback);
+router.get("/feedback/:id", verfiyToken, user.getFeedbackById);
+router.get("/feedback", verfiyToken, user.GetAllFeedBack);
 
-router
-    .route("/refer")
-    //.post(isAuthenticated, referController.generateRefer)
-    .get(isAuthenticated, referController.getReferral)
-    .put(isAuthenticated, referController.useReferCode);
-router.put("/feedback/:id", user.updateFeedback);
-router.put("/feedback/:id", user.deleteFeedback);
+// Refer
+router.get("/refer", verfiyToken, referController.getReferral);
+router.put("/refer", verfiyToken, referController.useReferCode);
 
-router.route("/feedback").post(user.UserFeedback);
-router.route("/feedback/:id").get(user.getFeedbackById);
-router.route("/feedback").get(user.GetAllFeedBack);
-// router.get(
-//     "/notification",
-//     isAuthenticated,
-//     notificationControllers.getNotification
-// );
-router.post("/payment", payment.CreatePaymentOrder),
-    router.get("/payment/:id", payment.GetPaymentsById);
+// Payment
+router.post("/payment", verfiyToken, payment.CreatePaymentOrder);
+router.get("/payment/:id", verfiyToken, payment.GetPaymentsById);
 
 // Testimonial
+router.get("/live", verfiyToken, user.GetAstroliveChanges);
+router.get("/upcoming", verfiyToken, user.GetAstroUpcoming);
 
-router.get("/live", user.GetAstroliveChanges);
-router.get("/upcoming", user.GetAstroUpcoming);
+// Terms
+router.get("/products/:id", verfiyToken, product.getProduct);
+router.get("/products", verfiyToken, product.getProducts);
 
-//Terms
-router.get("/products/:id", product.getProduct);
-router.get("/products", product.getProducts);
 module.exports = router;

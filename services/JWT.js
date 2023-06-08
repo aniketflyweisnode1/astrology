@@ -11,9 +11,9 @@ module.exports.signToken = (params) => {
   );
 };
 
-module.exports.verifyToken = (token) => {
+module.exports.verifyToken = (id) => {
   try {
-    const data = jwt.verify(token, JWT_SECRET);
+    const data = jwt.verify(id, JWT_SECRET);
     return [true, 'Login Success', data];
   } catch (error) {
     let err;

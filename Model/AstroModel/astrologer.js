@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const AstrologerSchema = new mongoose.Schema(
     {
@@ -178,5 +179,32 @@ const AstrologerSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+
+// PASSWORD - HASH
+AstrologerSchema.pre("save", async function (next) {
+    const salt = await bcrypt.genSaltSync(10);
+    this.password = await bcrypt.hashSync(this.password, salt);
+    next();
+});
+
+//MATCH HASH PASSWORD
+AstrologerSchema.methods.isPasswordValid = async function (enteredPassword) {
+    try {
+        return await bcrypt.compare(enteredPassword, this.password);
+    } catch (error) {
+        throw error;
+    }
+};
+
+AstrologerSchema.methods.createPasswordResetToken = async function () {
+    const resettoken = crypto.randomBytes(32).toString("hex");
+    this.passwordResetToken = crypto
+        .createHash("sha256")
+        .update(resettoken)
+        .digest("hex");
+    this.passwordResetExpires = Date.now() + 30 * 60 * 1000; // 10 minutes
+    return resettoken;
+};
 
 module.exports = mongoose.model("astrologer", AstrologerSchema);

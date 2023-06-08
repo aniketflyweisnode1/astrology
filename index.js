@@ -10,10 +10,10 @@ const serverless = require("serverless-http");
 const cookieparser = require("cookie-parser");
 require("dotenv").config();
 const { dbConnect } = require("./Config/DBConnect");
-const authRoute = require("./Routes/AstroRouter/authRoute");
-const astroLive = require("./Routes/AstroRouter/astrologerLiveScheduleRoute");
-const astroPost = require("./Routes/AstroRouter/astroPostRoute");
-const myProfileRouter = require("./Routes/AstroRouter/myProfileRoute");
+// const authRoute = require("./Routes/AstroRouter/authRoute");
+// const astroLive = require("./Routes/AstroRouter/astrologerLiveScheduleRoute");
+// const astroPost = require("./Routes/AstroRouter/astroPostRoute");
+// const myProfileRouter = require("./Routes/AstroRouter/myProfileRoute");
 // const authRouter = require("./Routes/UserRouter/auth.route");
 // const router = require("./Routes/UserRouter/bannerRoutes");
 // const Birthrouter = require("./Routes/UserRouter/birthDetails.route");
@@ -42,10 +42,10 @@ app.use(globalErrorHandler);
 
 /////////////////// ASTRO ///////////////////
 
-app.use("/astro", authRoute);
-app.use("/live", astroLive);
-app.use("/post", astroPost);
-app.use("/", myProfileRouter);
+// app.use("/astro", authRoute);
+// app.use("/live", astroLive);
+// app.use("/post", astroPost);
+// app.use("/", myProfileRouter);
 
 
 /////////////////// USER ///////////////////

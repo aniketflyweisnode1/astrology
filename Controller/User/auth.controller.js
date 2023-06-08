@@ -20,11 +20,13 @@ var newOTP = require("otp-generators");
 dotenv.config({ path: "../.env" });
 const { status } = require('express/lib/response');
 
-const generateJwtToken = (id) => {
-  return jwt.sign({ id }, JWT_KEY, {
-    expiresIn: "30d",
-  });
-};
+const token = require("../../Config/Token");
+
+// const generateJwtToken = (id) => {
+//   return jwt.sign({ id }, JWT_KEY, {
+//     expiresIn: "30d",
+//   });
+// };
 
 exports.resendOtp = async (req, res) => {
   try {
@@ -155,7 +157,7 @@ module.exports.login = async (req, res) => {
       });
     const isPassword = bcrypt.compareSync(password, user.password);
     if (isPassword) {
-      jwt.sign({ id: user._id }, JWT_KEY, (err, token) => {
+      jwt.sign({ id: user._id }, JWT_KEY, (err, verifyToken) => {
         if (err) return res.status(401).send("Invalid Credentials");
         console.log(token);
         return res.status(200).send({ user, token });
@@ -471,17 +473,27 @@ exports.loginWithMobile = async (req, res) => {
       return res.status(404).send({ message: "you are not registered" });
     }
     const otpGenerated = Math.floor(100 + Math.random() * 9000);
+    // const token = token.generateJwtToken(user._id);
+    // console.log(token),
     await User.findOneAndUpdate(
       { mobile: req.body.mobile },
       { otp: otpGenerated },
+
       { new: true }
     );
-    res.status(200).send({ userId: user._id, otp: otpGenerated });
+    const token1 = token.generateJwtToken(user._id);
+    //   console.log(token1);
+    res.setHeader("x-api-key", /* "Bearer "*/ +token);
+    res
+      .status(200)
+      .send({ userId: user._id, otp: otpGenerated, token: token1 });
   } catch (err) {
     console.log(err.message);
     res.status(400).send({ message: err.message });
   }
 };
+
+
 exports.verifyMobileOtp = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

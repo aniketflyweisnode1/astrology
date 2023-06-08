@@ -1,7 +1,7 @@
 const app = require("express");
 const path = require("path");
 const router = app.Router();
-
+const verfiyToken = require("../../Middleware/auth");
 
 const {
   addBanner,
@@ -10,9 +10,9 @@ const {
   deleteBanner,
 } = require("../../Controller/User/BannerController");
 
-router.post("/addBanner",  addBanner);
-router.get("/getBanner", getBanner);
-router.put("/editBanner/:id", editBanner);
-router.delete("/deleteBanner/:id", deleteBanner);
+router.post("/addBanner", verfiyToken,  addBanner);
+router.get("/getBanner", verfiyToken, getBanner);
+router.put("/editBanner/:id", verfiyToken, editBanner);
+router.delete("/deleteBanner/:id", verfiyToken, deleteBanner);
 
 module.exports = router;

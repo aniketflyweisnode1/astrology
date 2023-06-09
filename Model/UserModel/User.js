@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema(
     {
@@ -17,10 +19,12 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String,
             required: false,
+            default: "",
         },
-        confirmpassword: {
+        confirmPassword: {
             type: String,
             required: false,
+            default: "",
         },
         address: {
             type: String,
@@ -155,12 +159,12 @@ const userSchema = new mongoose.Schema(
     { timestamps: false }
 );
 
-userSchema.pre("save", function (next) {
-    const refer = generateOTP() + this.first_Name;
-    this.ReferCode = refer;
-    console.log("generated referal Code!");
-    next();
-});
+// userSchema.pre("save", function (next) {
+//     const refer = generateOTP() + this.first_Name;
+//     this.ReferCode = refer;
+//     console.log("generated referal Code!");
+//     next();
+// });
 
 // PASSWORD - HASH
 userSchema.pre("save", async function (next) {

@@ -9,10 +9,10 @@ const jwt = require("jsonwebtoken");
 const JWT_KEY = "rubi";
 const AppError = require("../../utils/AppError");
 const catchAsync = require("../../utils/catchAsync");
-const otp = require("../../services/OTP");
+// const otp = require("../../services/OTP");
 const blog = require("../../Model/UserModel/blog");
 const dotenv = require("dotenv");
-const otpGenerator = require('otp-generators');
+// const otpGenerator = require('otp-generators');
 const astrologer = require("../../Model/AstroModel/astrologer");
 const Admin = require("../../Model/Admin/AdminModel");
 const Wallet = require("../../Model/UserModel/wallet");
@@ -21,7 +21,7 @@ dotenv.config({ path: "../.env" });
 const { status } = require('express/lib/response');
 
 const token = require("../../Config/Token");
-
+const JwtToken = require("../../Config/Token")
 // const generateJwtToken = (id) => {
 //   return jwt.sign({ id }, JWT_KEY, {
 //     expiresIn: "30d",
@@ -56,6 +56,8 @@ exports.resendOtp = async (req, res) => {
     });
   }
 };
+
+
 exports.register = async (req, res) => {
   try {
     const { mobile } = req.body;
@@ -70,8 +72,9 @@ exports.register = async (req, res) => {
     console.log(user);
     res.status(200).json({ message: "OTP is Send ", otp: otp, data: user });
   } catch (err) {
-    res.status(400).json({
+    res.status(400).json({ 
       message: err.message,
+      
     });
   }
 };
@@ -261,147 +264,144 @@ exports.userMiddleware = async (req, res, next) => {
 // Verify
 
 module.exports.signUpUser = async (req, res) => {
+  try {
     const {
-        firstName,
-        lastName,
-        password,
-        confirmpassword,
-        gallery,
-        address,
-        email,
-        mobile,
-        country,
-        state,
-        district,
-        pincode,
-        highestQualification,
-        collegeOrInstitute,
-        passingYear,
-        govDocument,
-        language,
-        rashi,
-        desc,
-        skills,
-        specification,
-        fees,
-        rating,
-        link,
-        aboutMe,
-        gender,
-        dailyhoures,
-        experience,
+      firstName,
+      lastName,
+      password,
+      confirmPassword,
+      gallery,
+      address,
+      email,
+      mobile,
+      country,
+      state,
+      district,
+      pincode,
+      highestQualification,
+      collegeOrInstitute,
+      passingYear,
+      govDocument,
+      language,
+      rashi,
+      desc,
+      skills,
+      specification,
+      fees,
+      rating,
+      link,
+      aboutMe,
+      gender,
+      dailyHours,
+      experience,
     } = req.body;
-    console.log(req.body);
 
-    try {
-        // Check if user already exists
-        const existingMobile = await User.findOne({ mobile });
-        if (existingMobile) {
-            return res.status(402).send({ message: `${mobile} already exists` });
-        }
-
-        const existingEmail = await User.findOne({ email });
-        if (existingEmail) {
-            return res.status(402).send({ message: `${email} already exists` });
-        }
-
-        if (password !== confirmpassword) {
-            return res.status(401).json({ message: "Password does not match" });
-        }
-
-        const referCode = newOTP.generate(16, {
-            alphabets: true,
-            upperCase: true,
-            specialChar: false,
-        });
-
-        const hashedPassword = await bcrypt.hash(password.toString(), 8);
-        const confirmPassword = await bcrypt.hash(confirmpassword.toString(), 8);
-
-        const otpGenerated = Math.floor(100 + Math.random() * 9000);
-
-        const newUser = await User.findByIdAndUpdate(
-            req.params.id,
-            {
-                firstName,
-                lastName,
-                address,
-                gallery,
-                referCode,
-                email,
-                mobile,
-                country,
-                state,
-                district,
-                pincode,
-                highestQualification,
-                collegeOrInstitute,
-                passingYear,
-                govDocument,
-                language,
-                rashi,
-                desc,
-                skills,
-                specification,
-                fees,
-                rating,
-                link,
-                aboutMe,
-                gender,
-                password: hashedPassword,
-                confirmpassword: confirmPassword,
-                otp: otpGenerated,
-                dailyhoures: parseInt(dailyhoures),
-                experience,
-            },
-            { new: true }
-        );
-
-        if (req.body.referCode) {
-            const astro = await astrologer.findOne({ referCode: req.body.referCode });
-            let id = undefined;
-            if (astro) {
-                id = astro._id;
-            }
-            const user1 = await User.findOne({ referCode: req.body.referCode });
-            if (user1) {
-                id = user1._id;
-            }
-            if (id !== undefined) {
-                const user = await wallet.findOne({ userId: id });
-                user.balance += 200;
-                user.transactions.push({
-                    type: "credit",
-                    amount: 200,
-                    description: "Refer Bonus",
-                });
-                await user.save();
-            }
-        }
-
-        const walletObj = {
-            userId: newUser._id.toString(),
-            user: newUser._id,
-            balance: 0,
-        };
-
-        console.log(walletObj);
-        const w = await Wallet.create(walletObj);
-
-        newUser.wallet = w;
-        await newUser.save();
-
-        const token = generateJwtToken(newUser._id.toString());
-
-        return res.status(201).send({
-            message: "Signed up successfully",
-            data: newUser,
-            token: token,
-        });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: { message: error.message } });
+    // Check if user already exists
+    const existingMobile = await User.findOne({ mobile });
+    if (existingMobile) {
+      return res.status(402).send({ message: `${mobile} already exists` });
     }
+
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(402).send({ message: `${email} already exists` });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(401).json({ message: "Password does not match" });
+    }
+
+    const referCode = newOTP.generate(16, {
+      alphabets: true,
+      upperCase: true,
+      specialChar: false,
+    });
+
+    const hashedPassword = await bcrypt.hash(password.toString(), 8);
+    const hashedConfirmPassword = await bcrypt.hash(confirmPassword.toString(), 8);
+
+    const otpGenerated = Math.floor(100 + Math.random() * 9000);
+
+    const newUser = new User({
+      firstName,
+      lastName,
+      address,
+      gallery,
+      referCode,
+      email,
+      mobile,
+      country,
+      state,
+      district,
+      pincode,
+      highestQualification,
+      collegeOrInstitute,
+      passingYear,
+      govDocument,
+      language,
+      rashi,
+      desc,
+      skills,
+      specification,
+      fees,
+      rating,
+      link,
+      aboutMe,
+      gender,
+      password: hashedPassword,
+      confirmPassword: hashedConfirmPassword,
+      otp: otpGenerated,
+      dailyHours: parseInt(dailyHours),
+      experience,
+    });
+
+    await newUser.save();
+
+    if (req.body.referCode) {
+      const astro = await astrologer.findOne({ referCode: req.body.referCode });
+      let id;
+      if (astro) {
+        id = astro._id;
+      } else {
+        const user1 = await User.findOne({ referCode: req.body.referCode });
+        if (user1) {
+          id = user1._id;
+        }
+      }
+      if (id) {
+        const user = await Wallet.findOne({ userId: id });
+        user.balance += 200;
+        user.transactions.push({
+          type: "credit",
+          amount: 200,
+          description: "Refer Bonus",
+        });
+        await user.save();
+      }
+    }
+
+    const walletObj = {
+      userId: newUser._id.toString(),
+      user: newUser._id,
+      balance: 0,
+    };
+
+    const wallet = await Wallet.create(walletObj);
+
+    newUser.wallet = wallet;
+    await newUser.save();
+
+    const token = JwtToken.generateJwtToken(newUser._id.toString());
+
+    return res.status(201).send({
+      message: "Signed up successfully",
+      data: newUser,
+      token: token,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
 };
 
 exports.signup2 = async function (req, res) {
@@ -435,6 +435,7 @@ exports.signup2 = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
 exports.verifyOTP = async (req, res) => {
   try {
     const { otp } = req.body;

@@ -32,8 +32,8 @@ router.post("/sign/verify", authController.verifyOTPSignedIn);
 router.post("/login", verfiyToken, authController.login);
 
 router.put(
-    "/update-profile/:id",
-    isAuthenticated,
+    "/update-profile",
+    // isAuthenticated,
     verfiyToken,
     authController.updateUserProfile
 );

@@ -79,6 +79,8 @@ exports.register = async (req, res) => {
   }
 };
 
+
+
 exports.verifyOTP = async (req, res) => {
   try {
     const data = await User.findOne({ otp: req.body.otp });
@@ -87,7 +89,7 @@ exports.verifyOTP = async (req, res) => {
         message: "Your Otp is Wrong",
       });
     } else {
-      const accessToken = generateJwtToken(data._id.toString());
+      const accessToken = token.generateJwtToken(data._id.toString());
       res.status(200).json({
         message: "Login Done ",
         accessToken: accessToken,
@@ -436,44 +438,46 @@ exports.signup2 = async function (req, res) {
   }
 };
 
-exports.verifyOTP = async (req, res) => {
-  try {
-    const { otp } = req.body;
+// exports.verifyOTP = async (req, res) => {
+//   try {
+//     const { otp } = req.body;
 
-    const data = await User.findOne({ _id: req.params.id });
-    if (!data) {
-      return res.status(401).json({
-        message: "Your Otp is Wrong",
-      });
-    }
-    if (data.otp == otp) {
-      // await astrologer.findOneAndUpdate(
-      //     { _id: req.params.id },
-      //     { otp: "" },
-      //     { new: true }
-      // );
-      return res.status(200).json({
-        message: "Your Otp is verified",
-      });
-    }
-    return res.status(401).json({
-      message: "Your Otp is Wrong",
-    });
-  } catch (err) {
-    res.status(400).json({
-      message: err.message,
-    });
-  }
-};
+//     const data = await User.findOne({ _id: req.params.id });
+//     if (!data) {
+//       return res.status(401).json({
+//         message: "Your Otp is Wrong",
+//       });
+//     }
+//     if (data.otp == otp) {
+//       // await astrologer.findOneAndUpdate(
+//       //     { _id: req.params.id },
+//       //     { otp: "" },
+//       //     { new: true }
+//       // );
+//       return res.status(200).json({
+//         message: "Your Otp is verified",
+//       });
+//     }
+//     return res.status(401).json({
+//       message: "Your Otp is Wrong",
+//     });
+//   } catch (err) {
+//     res.status(400).json({
+//       message: err.message,
+//     });
+//   }
+// };
 
 // SignIn
 exports.loginWithMobile = async (req, res) => {
+  console.log("--------------------------------")
   try {
     const user = await User.findOne({ mobile: req.body.mobile });
+    console.log(user);
     if (!user) {
       return res.status(404).send({ message: "you are not registered" });
     }
-    const otpGenerated = Math.floor(100 + Math.random() * 9000);
+    const otpGenerated = Math.floor(1000 + Math.random() * 9000);
     // const token = token.generateJwtToken(user._id);
     // console.log(token),
     await User.findOneAndUpdate(

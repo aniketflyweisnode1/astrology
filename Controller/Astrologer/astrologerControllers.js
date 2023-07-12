@@ -280,13 +280,13 @@ exports.verifyOTP = async (req, res) => {
   }
 };
 // SignIn
-exports.loginWithMobile = async (req, res) => {
+exports.loginWithMobile = async (req, res) => { 
   try {
     const Astrologer = await astrologer.findOne({ mobile: req.body.mobile });
     if (!Astrologer) {
       return res.status(404).send({ message: "you are not registered" });
     }
-    const otpGenerated = Math.floor(100 + Math.random() * 9000);
+    const otpGenerated = Math.floor(1000 + Math.random() * 9000);
     // const token = token.generateJwtToken(Astrologer._id);
     // console.log(token),
     await astrologer.findOneAndUpdate(

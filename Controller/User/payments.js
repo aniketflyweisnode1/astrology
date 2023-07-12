@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const uuid = require("uuid");
 const id = uuid.v4();
 const payment = require("../../Model/UserModel/payments");
+const { updateMany } = require("../../Model/UserModel/User");
 
 const Razorpay = new razerpay({
     key_id: "rzp_live_xhEiJ4uMcMKT1r",
@@ -65,3 +66,5 @@ exports.GetPaymentsById = async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 };
+
+    

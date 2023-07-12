@@ -20,9 +20,9 @@ router.post("/resend-otp/:id", authController.resendOtp);
 router.put("/signUp/:id", authController.signUpUser);
 router.put("/signup2/:id", authController.signup2);
 router.post("/login", authController.login);
-router.post("/verify/:id", verfiyToken, authController.verifyOTP);
+router.post("/verify/:id", /* verfiyToken, */ authController.verifyOTP);
 router.post("/loginwithmobile", authController.loginWithMobile);
-router.post("/verifymobileotp/:id", verfiyToken, authController.verifyMobileOtp);
+router.post("/verifymobileotp/:id", /* verfiyToken, */ authController.verifyMobileOtp);
 router.post("/forgotpassword", verfiyToken, authController.forgetPassword);
 router.patch("/resetpassword/:id", verfiyToken, authController.resetPassword);
 

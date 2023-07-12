@@ -24,13 +24,13 @@ exports.updateBirthDetails = async (req, res) => {
             birthCity: birthDetails.birthCity,
         };
 
-        res.status(200).json({
+       return res.status(200).json({
             message: "Birth Details Updated",
             data: resObj,
         });
-        res.status(201).json({ message: birthDetails });
+      return  res.status(201).json({ message: birthDetails });
     } catch (error) {
-        res.status(400).json({ message: error.message, status: false });
+      return  res.status(400).json({ message: error.message, status: false });
     }
 };
 

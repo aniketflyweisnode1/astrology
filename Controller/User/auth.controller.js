@@ -34,7 +34,7 @@ exports.resendOtp = async (req, res) => {
   try {
     const otp = Math.floor(1000 + Math.random() * 9000);
 
-    const user = await User.findById(
+    const user = await User.findByIdAndUpdate(
       req.params.id,
       { otp: otp },
       { new: true }
@@ -58,6 +58,55 @@ exports.resendOtp = async (req, res) => {
     });
   }
 };
+
+exports.verifyresendOTP = async (req, res) => {
+  try {
+    const data = await User.findOne({ otp: req.body.otp });
+    if (!data || data.length == 0) {
+      return res.status(401).json({
+        message: "Your Otp is Wrong",
+      });
+    } 
+
+     // const accessToken = token.generateJwtToken(data._id.toString());
+      res.status(200).json({
+        message: "OTP MATCHED ",
+        //accessToken: accessToken,
+        userId: data._id,
+      });
+    }
+   catch (err) {
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+};
+
+// exports.verifyresendOTP = async (req, res) => {
+//   try {
+//     const userId = req.params.id;
+//     const user = await User.findById(userId);
+
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "User not found",
+//       });
+//     }
+
+//     const otp = Math.floor(1000 + Math.random() * 9000);
+//     user.otp = otp;
+//     await user.save();
+
+//     res.status(200).json({
+//       message: "OTP resent successfully",
+//       otp: otp,
+//     });
+//   } catch (err) {
+//     res.status(500).json({
+//       message: err.message,
+//     });
+//   }
+// };
 
 exports.register = async (req, res) => {
   try {

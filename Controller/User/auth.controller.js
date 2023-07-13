@@ -20,7 +20,7 @@ var newOTP = require("otp-generators");
 dotenv.config({ path: "../.env" });
 const { status } = require('express/lib/response');
 
-// const token = require("../../Config/Token");
+const token = require("../../Config/Token");
 const JwtToken = require("../../Config/Token")
 // const generateJwtToken = (id) => {
 //   return jwt.sign({ id }, JWT_KEY, {

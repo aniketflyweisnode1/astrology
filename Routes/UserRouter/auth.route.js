@@ -16,7 +16,7 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 router.post("/register", authController.register);
-router.post("/resend-otp/:id", authController.resendOtp);
+router.get("/resend-otp/:id", verfiyToken, authController.resendOtp);
 router.put("/signUp/:id", authController.signUpUser);
 router.put("/signup2/:id", authController.signup2);
 router.post("/login", authController.login);

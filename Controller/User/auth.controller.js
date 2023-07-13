@@ -28,6 +28,8 @@ const JwtToken = require("../../Config/Token")
 //   });
 // };
 
+
+
 exports.resendOtp = async (req, res) => {
   try {
     const otp = Math.floor(1000 + Math.random() * 9000);
@@ -57,7 +59,6 @@ exports.resendOtp = async (req, res) => {
   }
 };
 
-
 exports.register = async (req, res) => {
   try {
     const { mobile } = req.body;
@@ -78,7 +79,6 @@ exports.register = async (req, res) => {
     });
   }
 };
-
 
 
 exports.verifyOTP = async (req, res) => {

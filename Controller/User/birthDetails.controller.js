@@ -3,35 +3,66 @@ const Astrologer = require("../../Model/AstroModel/astrologer");
 const User = require("../../Model/UserModel/User");
 const Notification = require("../../Model/UserModel/Notification");
 
-exports.updateBirthDetails = async (req, res) => {
-    try {
-        const birthDetails = await User.findOneAndUpdate(
-            { _id: req.params.id },
-            req.body,
-            { new: true }
-        );
-        if (!birthDetails) {
-            res.status(400).json({ message: "Birth Details not found" });
-        }
-        const resObj = {
-            firstName: birthDetails.firstName,
-            lastName: birthDetails.lastName,
-            email: birthDetails.email,
-            gender: birthDetails.gender,
-            birthDate: birthDetails.birthDate,
-            birthTime: birthDetails.birthTime,
-            birthCountry: birthDetails.birthCountry,
-            birthCity: birthDetails.birthCity,
-        };
+// exports.updateBirthDetails = async (req, res) => {
+//     try {
+//         const birthDetails = await User.findOneAndUpdate(
+//             { _id: req.params.id },
+//             req.body,
+//             { new: true }
+//         );
+//         if (!birthDetails) {
+//             res.status(400).json({ message: "Birth Details not found" });
+//         }
+//         const resObj = {
+//             firstName: birthDetails.firstName,
+//             lastName: birthDetails.lastName,
+//             email: birthDetails.email,
+//             gender: birthDetails.gender,
+//             birthDate: birthDetails.birthDate,
+//             birthTime: birthDetails.birthTime,
+//             birthCountry: birthDetails.birthCountry,
+//             birthCity: birthDetails.birthCity,
+//         };
 
-       return res.status(200).json({
-            message: "Birth Details Updated",
-            data: resObj,
-        });
-      return  res.status(201).json({ message: birthDetails });
-    } catch (error) {
-      return  res.status(400).json({ message: error.message, status: false });
+//         return res.status(200).json({
+//             message: "Birth Details Updated",
+//             data: resObj,
+//         });
+//     } catch (error) {
+//         return res.status(400).json({ message: error.message, status: false });
+//     }
+// };
+
+exports.updateBirthDetails = async (req, res) => {
+  try {
+    const birthDetails = await User.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      { new: true }
+    );
+
+    if (!birthDetails) {
+      return res.status(404).json({ message: "Birth Details not found" });
     }
+
+    const resObj = {
+      firstName: birthDetails.firstName,
+      lastName: birthDetails.lastName,
+      email: birthDetails.email,
+      gender: birthDetails.gender,
+      birthDate: birthDetails.birthDate,
+      birthTime: birthDetails.birthTime,
+      birthCountry: birthDetails.birthCountry,
+      birthCity: birthDetails.birthCity,
+    };
+
+    return res.status(200).json({
+      message: "Birth Details Updated",
+      data: resObj,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message, status: false });
+  }
 };
 
 exports.getBirthDetails = async (req, res) => {

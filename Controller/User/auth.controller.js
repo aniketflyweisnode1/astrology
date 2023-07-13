@@ -20,7 +20,7 @@ var newOTP = require("otp-generators");
 dotenv.config({ path: "../.env" });
 const { status } = require('express/lib/response');
 
-const token = require("../../Config/Token");
+// const token = require("../../Config/Token");
 const JwtToken = require("../../Config/Token")
 // const generateJwtToken = (id) => {
 //   return jwt.sign({ id }, JWT_KEY, {
@@ -72,9 +72,9 @@ exports.register = async (req, res) => {
     console.log(user);
     res.status(200).json({ message: "OTP is Send ", otp: otp, data: user });
   } catch (err) {
-    res.status(400).json({ 
+    console.log(err)
+    res.status(400).json({
       message: err.message,
-      
     });
   }
 };
@@ -143,36 +143,41 @@ exports.verifyOTPSignedIn = async (req, res, next) => {
     });
 };
 
-// SignIn
-module.exports.login = async (req, res) => {
+exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    // console.log(email);
-    // console.log(password)
-    if (!(email && password)) {
-      res.status(403).send("All input is required");
-    }
 
+    if (!email || !password) {
+      return res.status(400).send("Email and password are required");
+    }
+    console.log(password)
     const user = await User.findOne({ email });
-    console.log(user);
-
-    if (!user)
-      res.status(402).json({
-        message: "This Number is not registered",
-      });
-    const isPassword = bcrypt.compareSync(password, user.password);
-    if (isPassword) {
-      jwt.sign({ id: user._id }, JWT_KEY, (err, verifyToken) => {
-        if (err) return res.status(401).send("Invalid Credentials");
-        console.log(token);
-        return res.status(200).send({ user, token });
+    console.log(user)
+    if (!user) {
+      return res.status(404).json({
+        message: "This email is not registered",
       });
     }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log(isPasswordValid)
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const Token = JwtToken.generateJwtToken(user._id);
+
+    return res.status(200).send({
+      message: "User login Successfully",
+      token: Token,
+      data:user,
+    });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting Token & check if its there!
@@ -319,8 +324,8 @@ module.exports.signUpUser = async (req, res) => {
       specialChar: false,
     });
 
-    const hashedPassword = await bcrypt.hash(password.toString(), 8);
-    const hashedConfirmPassword = await bcrypt.hash(confirmPassword.toString(), 8);
+    const hashedPassword = await bcrypt.hash(password, 8);
+    const hashedConfirmPassword = await bcrypt.hash(confirmPassword, 8);
 
     const otpGenerated = Math.floor(100 + Math.random() * 9000);
 
@@ -519,31 +524,31 @@ exports.verifyMobileOtp = async (req, res) => {
     res.status(400).send({ error: error.message });
   }
 };
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!(email && password)) {
-      res.status(400).send("email and password are required");
-    }
-
-    const user = await User.findOne({ email });
-
-    if (!user)
-      res.status(400).json({
-        message: "email is not registered",
-      });
-    const isPassword = await compare(password, user.password);
-    if (isPassword) {
-      jwt.sign({ id: user._id }, JWT_KEY, (err, token) => {
-        if (err) return res.status(400).send("Invalid Credentials");
-        res.status(200).send({ token, user });
-      });
-    }
-  } catch (err) {
-    console.log(err);
-  }
-};
+// exports.login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     if (!(email && password)) {
+//       res.status(400).send("email and password are required");
+//     }
+    
+//     const user = await User.findOne({ email });
+    
+//     if (!user)
+//     res.status(400).json({
+//       message: "email is not registered",
+//     });
+//     const isPassword = await compare(password, user.password);
+//     console.log(isPassword)
+//     if (isPassword) {
+//       jwt.sign({ id: user._id }, JWT_KEY, (err, token) => {
+//         if (err) return res.status(400).send("Invalid Credentials");
+//         res.status(200).send({ token, user });
+//       });
+//     }
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
 
 exports.forgetPassword = async (req, res) => {
   try {
@@ -613,7 +618,6 @@ module.exports.updateUserProfile = async (req, res) => {
 };
 
 // /get api
-
 module.exports.GetUserProfiles = async (req, res) => {
   // console.log(req.user);
   try {

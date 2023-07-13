@@ -4,7 +4,10 @@ const feedback = require("../../Model/UserModel/feedback");
 const astroSttus = require("../../Model/AstroModel/astroStatus");
 const astrologer = require("../../Model/AstroModel/astrologer");
 // const UserDetail = require('../models/userDetails')
-//post api--
+const JwtToken = require("../../Config/Token");
+const bcrypt = require("bcryptjs");
+
+
 
 module.exports.postuserProfiles = async (req, res) => {
     const {

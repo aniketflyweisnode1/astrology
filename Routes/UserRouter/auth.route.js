@@ -29,7 +29,7 @@ router.patch("/resetpassword/:id", verfiyToken, authController.resetPassword);
 // router.post("/sendOTP", authController.sendOTP);
 // router.post("/verify", verfiyToken, authController.verifyOTP);
 router.post("/sign/verify", authController.verifyOTPSignedIn);
-router.post("/login", verfiyToken, authController.login);
+// router.post("/login", verfiyToken, authController.login);
 
 router.put(
     "/update-profile",

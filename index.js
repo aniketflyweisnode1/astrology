@@ -12,7 +12,7 @@ require("dotenv").config();
 const { dbConnect } = require("./Config/DBConnect");
 // const authRoute = require("./Routes/AstroRouter/authRoute");
 // const astroLive = require("./Routes/AstroRouter/astrologerLiveScheduleRoute");
-// const astroPost = require("./Routes/AstroRouter/astroPostRoute");
+const astroPost = require("./Routes/AstroRouter/astroPostRoute");
 // const myProfileRouter = require("./Routes/AstroRouter/myProfileRoute");
 // const authRouter = require("./Routes/UserRouter/auth.route");
 // const router = require("./Routes/UserRouter/bannerRoutes");
@@ -44,7 +44,7 @@ app.use(globalErrorHandler);
 
 // app.use("/astro", authRoute);
 // app.use("/live", astroLive);
-// app.use("/post", astroPost);
+app.use("/post", astroPost);
 // app.use("/", myProfileRouter);
 
 

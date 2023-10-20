@@ -1,4 +1,5 @@
 const AstroPost = require("../../Model/AstroModel/astroPostModel");
+const Blog = require("../../Model/UserModel/blog");
 const asyncHandler = require("express-async-handler");
 
 const createAstroPost = asyncHandler(async (req, res) => {

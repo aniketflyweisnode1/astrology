@@ -1,15 +1,22 @@
 const AstroPost = require("../../Model/AstroModel/astroPostModel");
 const Blog = require("../../Model/UserModel/blog");
 const asyncHandler = require("express-async-handler");
+const mongoose = require("mongoose");
+
 
 const createAstroPost = asyncHandler(async (req, res) => {
   try {
     const { title, userID } = req.body;
 
+    if (!req.file) {
+      return res.status(400).json({ status: 400, error: "Image file is required" });
+    }
+
     // Create a new astro post
     const newPost = new AstroPost({
       title,
       userID,
+      image: req.file.path,
     });
 
     // Save the new post to the database
@@ -51,10 +58,20 @@ const getAllPost = asyncHandler(async (req, res) => {
 const updatePost = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
-    const post = await AstroPost.findByIdAndUpdate(id, req.body, {
+
+    if (!req.file) {
+      return res.status(400).json({ status: 400, error: "Image file is required" });
+    }
+
+    const updatedFields = {
+      ...req.body,
+      image: req.file.path,
+    };
+
+    const post = await AstroPost.findByIdAndUpdate(id, updatedFields, {
       new: true,
     });
-    res.status(200).json({ post: "Updated posts successfully." });
+    res.status(200).json({ post: "Updated posts successfully.", data: post });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Something went wrong in updated Post!" });
@@ -143,13 +160,13 @@ const getPost = asyncHandler(async (req, res) => {
 // });
 
 
-const likeThePost = asyncHandler(async (req, res) => {
+const likeThePost1 = asyncHandler(async (req, res) => {
   try {
     const { postId } = req.body;
     // Find the post which you want to be liked
-    const post = await Blog.findById(postId);
+    const post = await AstroPost.findById(postId);
     // find the  user
-    const UserId = req?.user?._id;
+    const UserId = req?.user;
     // find if the user has liked the post
     const isDisLiked = post?.isDisliked;
     // find if the user has disliked the post
@@ -157,7 +174,7 @@ const likeThePost = asyncHandler(async (req, res) => {
       (userId) => userId?.toString() === UserId?.toString()
     );
     if (alreadyLiked) {
-      const post = await Blog.findByIdAndUpdate(
+      const post = await AstroPost.findByIdAndUpdate(
         postId,
         {
           $pull: { likes: UserId },
@@ -168,7 +185,7 @@ const likeThePost = asyncHandler(async (req, res) => {
       res.json(post);
     }
     if (isDisLiked) {
-      const post = await Blog.findByIdAndUpdate(
+      const post = await AstroPost.findByIdAndUpdate(
         postId,
         {
           $pull: { dislikes: UserId },
@@ -178,7 +195,7 @@ const likeThePost = asyncHandler(async (req, res) => {
       );
       res.json(post);
     } else {
-      const post = await Blog.findByIdAndUpdate(
+      const post = await AstroPost.findByIdAndUpdate(
         postId,
         {
           $push: { dislikes: UserId },
@@ -195,9 +212,80 @@ const likeThePost = asyncHandler(async (req, res) => {
 });
 
 
+const likeThePost = async (req, res) => {
+  try {
+    const { postId } = req.body;
+
+    const post = await AstroPost.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    const userId = req.user;
+
+    const alreadyLiked = post.likes.includes(userId);
+
+    if (alreadyLiked) {
+      post.likes = post.likes.filter((id) => id.toString() !== userId.toString());
+      post.totalLike -= 1;
+      post.isLiked = false;
+    } else {
+      post.likes.push(userId);
+      post.totalLike += 1;
+      post.isLiked = true;
+    }
+    post.totalViews += 1;
+
+    await post.save();
+
+    return res.status(200).json(post);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to like the post' });
+  }
+};
+
+
+
+
+const getUsersWhoLikedPost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const post = await AstroPost.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    await post
+      .populate('likes', 'firstName email mobile')
+
+    const likedUsers = post.likes;
+
+    return res.status(200).json({status: 200, data: likedUsers});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to get liked users for the post' });
+  }
+};
+
+
+
+
+
+
+
+
 /////////////////////////////////////////////////////////=====> SHARE POST
 
-const shareThePost = asyncHandler(async (req, res) => {
+
+
+
+
+
+const shareThePost1 = asyncHandler(async (req, res) => {
   try {
     const postId = req.params.id;
     const { senderUserId, receiverUserIds } = req.body;
@@ -211,7 +299,7 @@ const shareThePost = asyncHandler(async (req, res) => {
     }
 
     // Check if the sender has the permission to share the post
-    if (post.author.toString() !== senderUserId) {
+    if (post.userID.toString() !== senderUserId) {
       return res.status(403).json({ error: "You don't have permission to share this post" });
     }
 
@@ -236,6 +324,75 @@ const shareThePost = asyncHandler(async (req, res) => {
   }
 });
 
+const shareThePost = asyncHandler(async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const senderUserId = req.user;
+    let { receiverUserIds } = req.body;
+
+    if (!Array.isArray(receiverUserIds)) {
+      receiverUserIds = [receiverUserIds];
+    }
+
+    const post = await AstroPost.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    if (post.userID.toString() !== senderUserId) {
+      return res.status(403).json({ error: "You don't have permission to share this post" });
+    }
+
+    for (const receiverUserId of receiverUserIds) {
+      if (post.sharedWith.includes(receiverUserId)) {
+        continue;
+      }
+
+      post.sharedWith.push(receiverUserId);
+    }
+
+    const updatedPost = await post.save();
+
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to share the post" });
+  }
+});
+
+
+
+
+const addCommentToPost = asyncHandler(async (req, res) => {
+  try {
+    const { postId, text } = req.body;
+    const UserId = req.user;
+
+    const post = await AstroPost.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const newComment = {
+      user: UserId,
+      text,
+    };
+
+    post.comments.push(newComment);
+
+    const updatedPost = await post.save();
+
+    res.json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to add a comment" });
+  }
+});
+
+
+
 module.exports = {
   createAstroPost,
   getAllPost,
@@ -243,5 +400,8 @@ module.exports = {
   deletePost,
   getPost,
   likeThePost,
+  // dislikeThePost,
   shareThePost,
+  addCommentToPost,
+  getUsersWhoLikedPost
 };

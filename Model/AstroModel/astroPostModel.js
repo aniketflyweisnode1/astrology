@@ -22,34 +22,55 @@ const asrtroPostSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    numViews: {
+    totalViews: {
       type: Number,
       default: 0,
     },
+    totalLike: {
+      type: Number,
+      default: 0,
+    },
+    // totalDislike: {
+    //   type: Number,
+    //   default: 0,
+    // },
     isLiked: {
       type: Boolean,
       default: false,
     },
-    isDisliked: {
-      type: Boolean,
-      default: false,
-    },
+    // isDisliked: {
+    //   type: Boolean,
+    //   default: false,
+    // },
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
     ],
-    dislikes: [
+    // dislikes: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "User",
+    //   },
+    // ],
+    sharedWith: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
     ],
-    sharedWith: [
+    comments: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        text: String,
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
     ],
   },

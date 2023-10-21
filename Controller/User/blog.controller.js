@@ -16,7 +16,10 @@ exports.createBlog = async (req, res) => {
     // req.body.blogImage = { url: req.file.location, key: req.file.key };
     try {
         // console.log(req.body);
-        const newBlog = new Blog(req.body);
+        if (!req.file) {
+            return res.status(400).json({ status: 400, error: "Image file is required" });
+        }
+        const newBlog = new Blog({ ...req.body, blogImage: req.file.path, });
 
         await newBlog.save();
 
@@ -53,14 +56,23 @@ exports.updateBlogById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        let blog = await Blog.findByIdAndUpdate(id, req.body, { new: true });
+        if (!req.file) {
+            return res.status(400).json({ status: 400, error: "Image file is required" });
+        }
+
+        const updatedFields = {
+            ...req.body,
+            blogImage: req.file.path,
+        };
+
+        let blog = await Blog.findByIdAndUpdate(id, updatedFields, { new: true });
 
         if (!blog) {
             return res.status(404).json({ message: "Blog not found" });
         }
 
         res.status(200).json({
-            message: "blog Updated Successfully",
+            message: "Blog Updated Successfully",
             data: blog,
         });
     } catch (err) {
@@ -68,6 +80,7 @@ exports.updateBlogById = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 };
+
 
 // DELETE /api/blogs/:id
 exports.deleteBlogById = async (req, res) => {

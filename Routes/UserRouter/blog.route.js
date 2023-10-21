@@ -9,13 +9,13 @@ const verfiyToken = require("../../Middleware/auth");
 router.get("/blogs", verfiyToken, blogController.getBlogs);
 
 // POST /api/blogs
-router.post("/blogs", verfiyToken, upload.single("image"), blogController.createBlog);
+router.post("/blogs", verfiyToken, upload.single("blogImage"), blogController.createBlog);
 
 // GET /api/blogs/:id
 router.get("/blogs/:id", verfiyToken, blogController.getBlogById);
 
 // PUT /api/blogs/:id
-router.put("/blogs/:id", verfiyToken, blogController.updateBlogById);
+router.put("/blogs/:id", verfiyToken, upload.single("blogImage"), blogController.updateBlogById);
 
 // DELETE /api/blogs/:id
 router.delete("/blogs/:id", verfiyToken, blogController.deleteBlogById);
